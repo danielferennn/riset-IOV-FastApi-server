@@ -56,5 +56,5 @@ dist/
 build/
 
 # Local/private docs
-.README_CLIENT.md
-.README_SERVER.md
+README_CLIENT.md
+README_SERVER.md
