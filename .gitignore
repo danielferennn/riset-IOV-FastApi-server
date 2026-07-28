@@ -1,0 +1,60 @@
+# Local agent/workspace metadata
+.agents/
+.codex/
+
+# Python virtual environments and local dependencies
+.deps/
+.iovvenv/
+.venv/
+venv/
+env/
+
+# Environment variables and local config
+.env
+.env.*
+!.env.example
+
+# Logs and runtime data
+*.log
+logs/
+data/
+
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Private keys, certificates, and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+
+# OS/filesystem noise
+*:Zone.Identifier
+.DS_Store
+Thumbs.db
+
+# Python cache and test/build artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage/
+dist/
+build/
+
+# Local/private docs
+.README_CLIENT.md
+.README_SERVER.md
