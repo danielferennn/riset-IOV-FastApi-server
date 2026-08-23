@@ -1,91 +1,184 @@
-# IOV Backend Prototype
+# IoV FastAPI Backend
 
-Backend prototype untuk sistem Internet of Vehicles (IOV). Project ini menerima data GPS dari perangkat mobile dan data telemetry dari node kendaraan, lalu menampilkan data terbaru melalui REST API dan dashboard peta.
+Backend prototype Internet of Vehicles (IoV) untuk menerima GPS dari perangkat mobile, telemetry dari Raspberry Pi/kendaraan, status singkat pengguna, dan report kondisi jalan. Data terbaru dapat diakses melalui REST API, WebSocket, dan dashboard peta pada `/map`.
 
-## Fitur
+> Project ini masih prototype. Email, node, dan PID pada registry adalah data dummy dan belum dapat dianggap sebagai autentikasi production.
 
-- API backend menggunakan FastAPI.
-- Ingest data GPS dari HP.
-- Ingest data telemetry dari Raspberry Pi atau node kendaraan.
-- Registrasi node prototype dengan PID dummy.
-- Snapshot data terbaru semua node.
-- Status message singkat pada node dengan masa aktif 2 jam.
-- Submit report kondisi jalan dengan lokasi tetap dan foto opsional.
-- Dashboard peta di endpoint `/map`.
-- Penyimpanan GPS/telemetry runtime berbasis JSON/JSONL.
-- Penyimpanan status message berbasis SQLite dan migration Alembic.
+## Fitur Utama
 
-## Tech Stack
+- Ingest GPS dan telemetry dari node yang terdaftar.
+- Snapshot data terbaru seluruh node atau satu node.
+- Status message yang melekat pada marker node.
+- Report kondisi jalan dengan lokasi dan foto opsional.
+- Dashboard peta untuk node, message aktif, dan report.
+- REST API, dokumentasi Swagger, dan broadcast WebSocket.
+- Penyimpanan JSON/JSONL untuk GPS/telemetry serta SQLite untuk message/report.
+- Migrasi database menggunakan Alembic.
 
-- Python
-- FastAPI
-- Pydantic
-- SQLAlchemy
-- Alembic
-- Uvicorn
-- Pytest
-
-## Struktur Singkat
+## Struktur Proyek
 
 ```text
-app/              source backend
-alembic/          database migration
-static/markers/   asset marker peta
+app/              source FastAPI, model, storage, dan dashboard map
+alembic/          migration database
+static/markers/   ikon marker peta
 tests/            automated test
-requirements.txt  dependency Python
+data/             data runtime dan SQLite; tidak masuk Git
+uploads/          foto report; tidak masuk Git
 ```
 
-## Cara Menjalankan
+## Persyaratan
 
-Install dependency:
+- Python 3.10 atau lebih baru
+- `pip` dan `venv`
 
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
-
-Siapkan tabel status message:
+## Menjalankan Secara Lokal
 
 ```bash
+git clone https://github.com/danielferennn/riset-IOV-FastApi-server.git
+cd riset-IOV-FastApi-server
+
+python3 -m venv .iovvenv
+source .iovvenv/bin/activate
+python -m pip install -r requirements.txt
+
+mkdir -p data uploads/reports
 alembic upgrade head
-```
 
-Jalankan server:
-
-```bash
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-Buka:
+Buka layanan berikut:
 
-```text
-http://localhost:8000/docs
-http://localhost:8000/map
-```
+| URL | Fungsi |
+| --- | --- |
+| `http://127.0.0.1:8000/health` | Health check |
+| `http://127.0.0.1:8000/docs` | Swagger API |
+| `http://127.0.0.1:8000/map` | Dashboard peta |
 
-## Endpoint Utama
-
-| Method | Endpoint | Keterangan |
-| --- | --- | --- |
-| `GET` | `/health` | Cek status server |
-| `POST` | `/nodes/register` | Registrasi node prototype |
-| `POST` | `/ingest/gps` | Kirim data GPS |
-| `POST` | `/ingest/telemetry` | Kirim data telemetry |
-| `GET` | `/broadcast/latest` | Ambil snapshot terbaru semua node |
-| `POST` | `/nodes/{node_id}/status-message` | Buat status message; message tertua diganti jika dua slot penuh |
-| `GET` | `/nodes/{node_id}/status-message` | Ambil status message aktif |
-| `DELETE` | `/nodes/{node_id}/status-message?pid=...` | Hapus status message milik PID |
-| `GET` | `/nodes/{node_id}/status-messages` | Ambil riwayat status message |
-| `POST` | `/reports` | Submit report kondisi jalan |
-| `GET` | `/reports` | Ambil daftar report |
-| `GET` | `/reports/{report_id}` | Ambil detail report |
-| `GET` | `/map` | Dashboard peta |
-
-Setiap node dapat memiliki maksimal dua status message aktif. Masing-masing message otomatis kedaluwarsa dua jam setelah dipublikasikan. Jika message ketiga dibuat saat dua message masih aktif, message aktif paling lama digantikan, sedangkan riwayatnya tetap disimpan.
-
-## Test
+Verifikasi cepat:
 
 ```bash
-python -m pytest
+curl http://127.0.0.1:8000/health
 ```
+
+Respons yang diharapkan:
+
+```json
+{"status":"ok"}
+```
+
+Untuk pengujian dari perangkat lain dalam jaringan lokal, jalankan dengan `--host 0.0.0.0`, lalu akses IP komputer/server. Pastikan port hanya dibuka pada jaringan yang dipercaya.
+
+## Konfigurasi Environment
+
+Semua konfigurasi bersifat opsional untuk penggunaan lokal.
+
+| Variable | Default | Fungsi |
+| --- | --- | --- |
+| `IOV_ROOT_PATH` | kosong | Prefix reverse proxy, misalnya `/riset-iov` |
+| `IOV_DATA_DIR` | `data` | Lokasi JSON/JSONL GPS dan telemetry |
+| `IOV_DATABASE_URL` | `sqlite:///data/iov.db` | URL database message dan report |
+| `IOV_UPLOAD_DIR` | `uploads/reports` | Lokasi file foto report |
+| `IOV_ADMIN_TOKEN` | kosong | Token untuk mengaktifkan penghapusan report |
+
+Contoh menjalankan dengan direktori absolut:
+
+```bash
+export IOV_DATA_DIR=/opt/iov/data
+export IOV_DATABASE_URL=sqlite:////opt/iov/data/iov.db
+export IOV_UPLOAD_DIR=/opt/iov/uploads/reports
+
+mkdir -p "$IOV_DATA_DIR" "$IOV_UPLOAD_DIR"
+alembic upgrade head
+uvicorn app.main:app --host 127.0.0.1 --port 8000
+```
+
+Jangan menyimpan token, password database, atau credential lain di source code dan `alembic.ini`. Gunakan environment service atau file environment yang tidak masuk Git.
+
+## API Utama
+
+| Method | Endpoint | Fungsi |
+| --- | --- | --- |
+| `GET` | `/health` | Memeriksa backend |
+| `GET` | `/pids` | Melihat assignment node/PID prototype |
+| `POST` | `/nodes/register` | Registrasi node menggunakan email dummy |
+| `POST` | `/ingest/gps` | Mengirim GPS dari mobile |
+| `POST` | `/ingest/telemetry` | Mengirim telemetry dari Raspberry Pi/kendaraan |
+| `GET` | `/broadcast/latest` | Snapshot terbaru seluruh node untuk client/map |
+| `GET` | `/nodes/{node_id}/latest` | Snapshot satu node |
+| `POST` | `/nodes/{node_id}/status-message` | Membuat status message |
+| `GET` | `/nodes/{node_id}/status-messages` | Membaca message aktif dan riwayatnya |
+| `POST` | `/reports` | Membuat report melalui `multipart/form-data` |
+| `GET` | `/reports` | Membaca daftar report; mendukung filter area |
+| `GET` | `/reports/{report_id}` | Membaca detail report |
+| `GET` | `/reports/{report_id}/photos/{photo_id}` | Mengambil foto report |
+| `DELETE` | `/reports/{report_id}` | Menghapus report dengan `X-Admin-Token` |
+| `GET` | `/events` | Membaca event terbaru untuk debugging |
+| `WS` | `/ws/maps` | Broadcast event GPS/telemetry real-time |
+
+Skema request dan response lengkap tersedia pada `/docs`.
+
+### Status Message
+
+- Kategori: `traffic`, `road_condition`, `hazard`, `weather`, dan `info`.
+- Maksimal dua message aktif per node.
+- Setiap message kedaluwarsa dua jam setelah dipublikasikan.
+- Message ketiga menggantikan message aktif paling lama; riwayat tetap disimpan.
+- `active_messages` pada snapshot berisi seluruh message aktif. `active_message` tetap tersedia untuk kompatibilitas client lama.
+
+### Report
+
+- Kategori: `road_damage`, `traffic`, `accident`, `flood`, `obstacle`, dan `other`.
+- `title`, `description`, `lat`, dan `lon` wajib diisi.
+- Foto tidak wajib; maksimal tiga foto dengan ukuran 5 MB per file.
+- Format foto yang diterima: JPEG, PNG, dan WebP.
+- Report tidak expired dan tidak dikirim melalui `/broadcast/latest`; client mengambilnya melalui `/reports`.
+- URL foto pada response bersifat relatif terhadap base URL server.
+
+Penghapusan report hanya aktif jika `IOV_ADMIN_TOKEN` dikonfigurasi. Request harus membawa header `X-Admin-Token` dengan nilai yang sama.
+
+## Penyimpanan Data
+
+| Data | Penyimpanan |
+| --- | --- |
+| GPS/telemetry terbaru | `data/latest_nodes.json` |
+| Riwayat event GPS/telemetry | `data/events.jsonl` |
+| Status message dan metadata report | SQLite, default `data/iov.db` |
+| File foto report | `uploads/reports/` |
+
+Direktori runtime, database, upload, `.env`, virtual environment, dan credential sudah dikecualikan melalui `.gitignore`.
+
+## Pengujian
+
+```bash
+source .iovvenv/bin/activate
+alembic upgrade head
+python -m pytest -q
+```
+
+## Deployment Singkat
+
+Untuk reverse proxy pada subpath, set prefix yang sama pada aplikasi dan proxy. Contoh:
+
+```bash
+export IOV_ROOT_PATH=/riset-iov
+uvicorn app.main:app --host 127.0.0.1 --port 8001
+```
+
+Nginx kemudian meneruskan `/riset-iov/` ke `http://127.0.0.1:8001/`. Jalankan migrasi dengan environment database yang sama sebelum me-restart service.
+
+## Troubleshooting Dasar
+
+| Masalah | Pemeriksaan dan solusi |
+| --- | --- |
+| `ModuleNotFoundError` | Aktifkan virtualenv dan jalankan `python -m pip install -r requirements.txt`. |
+| `unable to open database file` | Buat parent directory database, periksa permission, lalu pastikan `IOV_DATABASE_URL` menunjuk path yang benar. |
+| Tabel/kolom database belum tersedia | Jalankan `alembic current` lalu `alembic upgrade head` dengan `IOV_DATABASE_URL` yang sama seperti server. |
+| Port sudah digunakan | Periksa dengan `ss -ltnp` lalu gunakan port lain atau hentikan service yang bentrok. |
+| Tidak dapat diakses dari perangkat lain | Gunakan `--host 0.0.0.0`, periksa IP host, firewall, dan pastikan kedua perangkat berada pada jaringan yang sama. |
+| Map gagal mengambil data pada subpath | Pastikan `IOV_ROOT_PATH` dan location Nginx sama, lalu uji `/health` dan `/broadcast/latest` secara langsung. |
+| Upload foto ditolak | Pastikan format JPEG/PNG/WebP, maksimal tiga file, maksimal 5 MB per file, dan batas body proxy mencukupi. |
+| Delete report mendapat `401`/`503` | `401` berarti token salah/tidak dikirim; `503` berarti `IOV_ADMIN_TOKEN` belum dikonfigurasi. |
+| Backend menghasilkan `500` | Periksa traceback terminal atau `journalctl -u iov-backend -n 100 --no-pager`; untuk Nginx jalankan `nginx -t` dan periksa `/var/log/nginx/error.log`. |
+
+Project ini belum menyediakan user management, autentikasi node yang kuat, rate limiting, atau moderasi report. Tambahkan kontrol tersebut sebelum digunakan sebagai layanan production publik.
