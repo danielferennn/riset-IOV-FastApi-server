@@ -18,6 +18,7 @@ env/
 *.log
 logs/
 data/
+uploads/
 
 # Local databases
 *.db
@@ -55,6 +56,17 @@ coverage/
 dist/
 build/
 
-# Local/private docs
-README_CLIENT.md
-README_SERVER.md
+# Local/private docs (only the root README.md is public)
+/README*
+!/README.md
+/docs/
+/docs-private/
+/private-docs/
+*.doc
+*.docx
+*.odt
+*.pdf
+*.ppt
+*.pptx
+*.xls
+*.xlsx

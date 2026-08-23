@@ -24,19 +24,28 @@ MAP_HTML = """
 
     .app-shell {
       display: grid;
-      grid-template-columns: 360px minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1fr) 360px;
       width: 100vw;
       height: 100vh;
       min-height: 0;
     }
 
     .sidebar {
+      grid-column: 2;
+      grid-row: 1;
       min-width: 0;
       min-height: 0;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
       padding: 16px;
-      border-right: 1px solid #d6dddf;
+      border-left: 1px solid #d6dddf;
       background: #f8faf9;
+    }
+
+    .map-wrap {
+      grid-column: 1;
+      grid-row: 1;
     }
 
     .sidebar h1 {
@@ -50,6 +59,42 @@ MAP_HTML = """
       font-size: 13px;
       line-height: 1.4;
       color: #58666d;
+    }
+
+    .sidebar-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin: 8px 0 12px;
+    }
+
+    .sidebar-tab {
+      border: 1px solid #cbd5d8;
+      border-radius: 6px;
+      padding: 8px 6px;
+      background: #ffffff;
+      color: #58666d;
+      cursor: pointer;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .sidebar-tab.active {
+      border-color: #2d8f6f;
+      background: #e9f7ef;
+      color: #146c43;
+    }
+
+    .sidebar-panel {
+      display: none;
+      min-width: 0;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-panel.active {
+      display: block;
     }
 
     .node-list {
@@ -79,6 +124,32 @@ MAP_HTML = """
       line-height: 1.45;
     }
 
+    .status-message-item {
+      min-width: 0;
+      margin-bottom: 8px;
+      border: 1px solid #e1e7e9;
+      border-radius: 6px;
+      padding: 8px;
+      background: #fbfefd;
+    }
+
+    .status-message-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .status-message-item .detail-grid {
+      grid-template-columns: 82px minmax(0, 1fr);
+    }
+
+    .status-message-item .value {
+      overflow-wrap: break-word;
+      word-break: normal;
+    }
+
+    .detail-content {
+      min-width: 0;
+    }
+
     .inline-detail {
       margin-top: 10px;
       border-top: 1px solid #e1e7e9;
@@ -102,6 +173,11 @@ MAP_HTML = """
     .node:hover {
       border-color: #8ab9aa;
       background: #fbfefd;
+    }
+
+    .node:focus-visible {
+      outline: 3px solid rgba(45, 143, 111, 0.35);
+      outline-offset: 2px;
     }
 
     .node.has-gps {
@@ -136,6 +212,11 @@ MAP_HTML = """
     .badge.missing {
       background: #f1f3f5;
       color: #69757c;
+    }
+
+    .badge.message-badge {
+      background: #fff0c2;
+      color: #7a5600;
     }
 
     .kv {
@@ -246,6 +327,11 @@ MAP_HTML = """
       margin-top: 10px;
     }
 
+    .popup-section-divider {
+      margin: 8px 0;
+      border-top: 1px solid #e3e9eb;
+    }
+
     .popup-section-title {
       margin-bottom: 7px;
       color: #5c6a71;
@@ -348,10 +434,128 @@ MAP_HTML = """
       transform: scale(1.16);
     }
 
+    .report-marker {
+      width: 30px;
+      height: 30px;
+      border: 3px solid #ffffff;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      background: #c2410c;
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 24px;
+      text-align: center;
+      box-shadow: 0 5px 12px rgba(23, 32, 38, 0.3);
+    }
+
+    .report-marker span {
+      display: block;
+      transform: rotate(45deg);
+    }
+
+    .report-photo {
+      display: block;
+      width: 100%;
+      max-height: 160px;
+      margin-top: 8px;
+      border-radius: 6px;
+      object-fit: cover;
+    }
+
+    .report-log {
+      margin-top: 18px;
+      border-top: 1px solid #d6dddf;
+      padding-top: 14px;
+    }
+
+    .report-log h2 {
+      margin: 0 0 4px;
+      font-size: 15px;
+    }
+
+    .report-log-help {
+      margin: 0 0 10px;
+      color: #69777e;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .report-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .report-list-message {
+      color: #69777e;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .report-item {
+      border: 1px solid #d6dddf;
+      border-left: 4px solid #c2410c;
+      border-radius: 6px;
+      padding: 9px;
+      background: #ffffff;
+    }
+
+    .report-item-title {
+      color: #172026;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .report-item-meta,
+    .report-item-description {
+      margin-top: 4px;
+      color: #69777e;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .report-item-description {
+      color: #40515a;
+      overflow-wrap: anywhere;
+    }
+
     .marker-wrap {
       position: relative;
       width: 44px;
       height: 58px;
+    }
+
+    .asset-marker-wrap {
+      position: relative;
+      width: 44px;
+      height: 58px;
+    }
+
+    .asset-marker-wrap img {
+      display: block;
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 8px rgba(23, 32, 38, 0.28));
+    }
+
+    .marker-status-badge {
+      position: absolute;
+      top: -4px;
+      right: -3px;
+      min-width: 18px;
+      height: 18px;
+      border: 2px solid #ffffff;
+      border-radius: 999px;
+      padding: 0 4px;
+      background: #d97706;
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 14px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(23, 32, 38, 0.24);
     }
 
     .marker-label {
@@ -403,14 +607,16 @@ MAP_HTML = """
       }
 
       .map-wrap {
+        grid-column: 1;
         grid-row: 1;
         height: 55vh;
         min-height: 340px;
       }
 
       .sidebar {
+        grid-column: 1;
         grid-row: 2;
-        border-right: 0;
+        border-left: 0;
         border-top: 1px solid #d6dddf;
       }
     }
@@ -420,14 +626,28 @@ MAP_HTML = """
   <main class="app-shell">
     <aside class="sidebar">
       <h1>IOV Node Map</h1>
-      <div id="status" class="status">Mengambil data node...</div>
-      <div id="node-list" class="node-list"></div>
-      <div class="icon-attribution">
-        Icons:
-        <a href="https://www.flaticon.com/free-icons/stride" title="stride icons" target="_blank" rel="noopener">Stride icons created by meaicon - Flaticon</a>
-        |
-        <a href="https://www.flaticon.com/free-icons/traffic" title="traffic icons" target="_blank" rel="noopener">Traffic icons created by Magnific - Flaticon</a>
+      <div class="sidebar-tabs" role="tablist" aria-label="Navigasi dashboard">
+        <button id="nodes-tab" class="sidebar-tab active" type="button" role="tab" aria-selected="true">Node Aktif</button>
+        <button id="reports-tab" class="sidebar-tab" type="button" role="tab" aria-selected="false">Log Report</button>
       </div>
+      <section id="nodes-panel" class="sidebar-panel active" role="tabpanel">
+        <div id="status" class="status">Mengambil data node...</div>
+        <div id="node-list" class="node-list"></div>
+        <div class="icon-attribution">
+          Icons:
+          <a href="https://www.flaticon.com/free-icons/stride" title="stride icons" target="_blank" rel="noopener">Stride icons created by meaicon - Flaticon</a>
+          |
+          <a href="https://www.flaticon.com/free-icons/traffic" title="traffic icons" target="_blank" rel="noopener">Traffic icons created by Magnific - Flaticon</a>
+        </div>
+      </section>
+      <section id="reports-panel" class="sidebar-panel" role="tabpanel">
+        <div class="report-log">
+          <h2>Log Report</h2>
+          <p class="report-log-help">Report terbaru akan muncul di sini dan pada peta. Penghapusan dilakukan melalui akses admin server.</p>
+          <div id="report-status" class="status">Mengambil report...</div>
+          <div id="report-list" class="report-list"></div>
+        </div>
+      </section>
     </aside>
     <section class="map-wrap">
       <div id="map"></div>
@@ -441,11 +661,27 @@ MAP_HTML = """
       var nodeList = document.getElementById("node-list");
       var statusEl = document.getElementById("status");
       var messageEl = document.getElementById("map-message");
+      var reportList = document.getElementById("report-list");
+      var reportStatusEl = document.getElementById("report-status");
+      var nodesTab = document.getElementById("nodes-tab");
+      var reportsTab = document.getElementById("reports-tab");
+      var nodesPanel = document.getElementById("nodes-panel");
+      var reportsPanel = document.getElementById("reports-panel");
       var markers = {};
+      var reportMarkers = {};
       var map = null;
       var hasFittedBounds = false;
+      var hasFittedReports = false;
       var latestNodes = [];
+      var latestNodesById = {};
+      var nodeItems = {};
       var selectedNodeId = null;
+      var NODE_POLL_INTERVAL_MS = 10000;
+      var REPORT_POLL_INTERVAL_MS = 30000;
+      var REQUEST_TIMEOUT_MS = 10000;
+      var MAX_POLL_BACKOFF_MS = 60000;
+      var nodePollState = { timer: null, inFlight: false, failures: 0 };
+      var reportPollState = { timer: null, inFlight: false, failures: 0 };
       var markerAssetUrls = {
         phone: "static/markers/pedestrian.png",
         raspi: "static/markers/vehicle.png"
@@ -463,6 +699,55 @@ MAP_HTML = """
       function hideMessage() {
         messageEl.textContent = "";
         messageEl.style.display = "none";
+      }
+
+      function fetchJsonWithTimeout(url) {
+        var controller = new AbortController();
+        var timeoutId = window.setTimeout(function () {
+          controller.abort();
+        }, REQUEST_TIMEOUT_MS);
+
+        return fetch(url, { cache: "no-store", signal: controller.signal })
+          .then(function (response) {
+            if (!response.ok) {
+              throw new Error("HTTP " + response.status);
+            }
+            return response.json();
+          })
+          .finally(function () {
+            window.clearTimeout(timeoutId);
+          });
+      }
+
+      function pollErrorText(error) {
+        if (error && error.name === "AbortError") {
+          return "timeout setelah " + Math.round(REQUEST_TIMEOUT_MS / 1000) + " detik";
+        }
+        return error && error.message ? error.message : "koneksi gagal";
+      }
+
+      function nextPollDelay(baseInterval, failures) {
+        if (!failures) {
+          return baseInterval;
+        }
+        return Math.min(baseInterval * Math.pow(2, failures), MAX_POLL_BACKOFF_MS);
+      }
+
+      function schedulePoll(state, callback, delay) {
+        if (state.timer !== null) {
+          window.clearTimeout(state.timer);
+        }
+        state.timer = window.setTimeout(callback, delay);
+      }
+
+      function activateSidebarTab(tabName) {
+        var showReports = tabName === "reports";
+        nodesTab.classList.toggle("active", !showReports);
+        reportsTab.classList.toggle("active", showReports);
+        nodesTab.setAttribute("aria-selected", String(!showReports));
+        reportsTab.setAttribute("aria-selected", String(showReports));
+        nodesPanel.classList.toggle("active", !showReports);
+        reportsPanel.classList.toggle("active", showReports);
       }
 
       function escapeHtml(value) {
@@ -513,6 +798,20 @@ MAP_HTML = """
           parts.push("Odo " + formatNumber(telemetry.odometer_km, 1) + " km");
         }
         return parts.length ? parts.join(" | ") : "Telemetry diterima";
+      }
+
+      function statusMessageText(message) {
+        if (!message) {
+          return "Tidak ada status aktif";
+        }
+        return message.message + " (sampai " + formatTimestamp(message.expires_at) + ")";
+      }
+
+      function activeMessages(node) {
+        if (node.active_messages && node.active_messages.length) {
+          return node.active_messages;
+        }
+        return node.active_message ? [node.active_message] : [];
       }
 
       function deviceType(node) {
@@ -570,13 +869,15 @@ MAP_HTML = """
       function markerIcon(node) {
         var type = deviceType(node);
         var isActive = selectedNodeId === node.node_id;
+        var messages = activeMessages(node);
+        var messageBadge = messages.length ? '<span class="marker-status-badge">' + messages.length + '</span>' : '';
         if (markerAssetReady[type]) {
-          return L.icon({
-            iconUrl: markerAssetUrls[type],
-            iconSize: type === "phone" ? [38, 38] : [44, 44],
-            iconAnchor: type === "phone" ? [19, 38] : [22, 44],
-            popupAnchor: [0, -42],
-            className: isActive ? "custom-marker active" : "custom-marker"
+          return L.divIcon({
+            className: isActive ? "custom-marker active" : "custom-marker",
+            html: '<div class="asset-marker-wrap"><img src="' + markerAssetUrls[type] + '" alt="">' + messageBadge + '</div>',
+            iconSize: [44, 58],
+            iconAnchor: [22, 44],
+            popupAnchor: [0, -44]
           });
         }
 
@@ -585,6 +886,7 @@ MAP_HTML = """
           html: [
             '<div class="marker-wrap">',
             '<div class="marker-label">' + escapeHtml(displayPid(node)) + '</div>',
+            messageBadge,
             '<div class="node-marker ' + type + (isActive ? " active" : "") + '">' + markerSvg(type) + '</div>',
             '</div>'
           ].join(""),
@@ -619,6 +921,15 @@ MAP_HTML = """
         ].join("");
       }
 
+      function renderDetailContentSection(title, contentHtml, emptyText) {
+        return [
+          '<section>',
+          '<div class="detail-section-title">' + escapeHtml(title) + '</div>',
+          contentHtml ? '<div class="detail-content">' + contentHtml + '</div>' : '<div class="detail-empty">' + escapeHtml(emptyText) + '</div>',
+          '</section>'
+        ].join("");
+      }
+
       function popupMetric(label, value) {
         return [
           '<div class="popup-metric">',
@@ -637,11 +948,55 @@ MAP_HTML = """
         ].join("");
       }
 
+      function reportPopupHtml(report) {
+        var photos = report.photos || [];
+        var photoHtml = photos.length
+          ? photos.map(function (photo) {
+              return '<img class="report-photo" src="' + escapeHtml(photo.url) + '" alt="Foto report">';
+            }).join("")
+          : '<div class="popup-empty">Report ini tidak memiliki foto.</div>';
+        return [
+          '<div class="popup-panel">',
+          '<div class="popup-header">',
+          '<div class="popup-title">' + escapeHtml(report.title) + '</div>',
+          '<div class="popup-type">' + escapeHtml(report.category) + '</div>',
+          '</div>',
+          '<div class="popup-empty">' + escapeHtml(report.description) + '</div>',
+          '<div class="popup-footer">Dilaporkan ' + escapeHtml(formatTimestamp(report.created_at)) + '</div>',
+          photoHtml,
+          '</div>'
+        ].join("");
+      }
+
+      function reportCategoryText(category) {
+        return String(category || "other").replace(/_/g, " ");
+      }
+
+      function renderReportList(reports) {
+        if (!reports.length) {
+          reportList.innerHTML = '<div class="report-list-message">Belum ada report.</div>';
+          return;
+        }
+
+        reportList.innerHTML = reports.map(function (report) {
+          var photoCount = (report.photos || []).length;
+          return [
+            '<article class="report-item">',
+            '<div class="report-item-title">' + escapeHtml(report.title) + '</div>',
+            '<div class="report-item-meta">' + escapeHtml(reportCategoryText(report.category)) + ' | ' + escapeHtml(formatTimestamp(report.created_at)) + ' | ' + photoCount + ' foto</div>',
+            '<div class="report-item-description">' + escapeHtml(report.description) + '</div>',
+            '</article>'
+          ].join("");
+        }).join("");
+      }
+
       function nodeDetailHtml(node) {
         var gps;
         var telemetry;
         var telemetryRows;
         var sections;
+        var messages;
+        var messageRows;
 
         if (!node) {
           return "";
@@ -649,7 +1004,21 @@ MAP_HTML = """
 
         gps = node.latest_gps;
         telemetry = node.latest_telemetry;
+        messages = activeMessages(node);
+        messageRows = messages.map(function (message, index) {
+          return [
+            '<div class="status-message-item">',
+            '<div class="detail-section-title">Message ' + (index + 1) + '</div>',
+            '<div class="detail-grid">',
+            kv("Kategori", message.category),
+            kv("Message", message.message),
+            kv("Berlaku sampai", formatTimestamp(message.expires_at)),
+            '</div>',
+            '</div>'
+          ].join("");
+        }).join("");
         sections = [
+          renderDetailContentSection("Status Message", messageRows, "Tidak ada status message aktif."),
           renderDetailSection("GPS", gps ? [
             kv("PID", gps.pid),
             kv("Latitude", formatNumber(gps.lat, 6)),
@@ -702,18 +1071,24 @@ MAP_HTML = """
         }
       }
 
-      function previewNode(node) {
-        selectedNodeId = node.node_id;
-        renderNodeList(latestNodes);
-        updateMarkerStyles();
-      }
-
       function popupHtml(node) {
         var gps = node.latest_gps;
         var telemetry = node.latest_telemetry;
         var gpsMetrics = [];
         var telemetryMetrics = [];
         var sections = [];
+        var messages = activeMessages(node);
+
+        if (messages.length) {
+          sections.push(popupSection(
+            "Status Message",
+            messages.map(function (message, index) {
+              return '<div class="popup-empty"><strong>Message ' + (index + 1) + ': ' + escapeHtml(message.category) + '</strong><br>' +
+                escapeHtml(message.message) + '</div>' +
+                '<div class="popup-footer">Berlaku sampai ' + escapeHtml(formatTimestamp(message.expires_at)) + '</div>';
+            }).join('<div class="popup-section-divider"></div>')
+          ));
+        }
 
         if (gps) {
           gpsMetrics.push(popupMetric("Latitude", formatNumber(gps.lat, 6)));
@@ -774,38 +1149,68 @@ MAP_HTML = """
       }
 
       function renderNodeList(nodes) {
-        nodeList.innerHTML = "";
+        var visibleNodeIds = {};
+
+        latestNodesById = {};
         nodes.forEach(function (node) {
           var gps = node.latest_gps;
           var telemetry = node.latest_telemetry;
+          var messages = activeMessages(node);
           var updatedAt = gps && gps.timestamp ? gps.timestamp : telemetry && telemetry.timestamp ? telemetry.timestamp : null;
           var latLon = gps ? formatNumber(gps.lat, 6) + ", " + formatNumber(gps.lon, 6) : "-";
           var pidLabel = displayPid(node);
-          var item = document.createElement("div");
+          var nodeId = node.node_id;
+          var item = nodeItems[nodeId];
+
+          visibleNodeIds[nodeId] = true;
+          latestNodesById[nodeId] = node;
+          if (!item) {
+            item = document.createElement("div");
+            item.setAttribute("data-node-id", nodeId);
+            item.setAttribute("role", "button");
+            item.setAttribute("tabindex", "0");
+            item.addEventListener("click", function () {
+              var currentNode = latestNodesById[nodeId];
+              if (currentNode) {
+                selectNode(currentNode, Boolean(currentNode.latest_gps));
+              }
+            });
+            item.addEventListener("keydown", function (event) {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                var currentNode = latestNodesById[nodeId];
+                if (currentNode) {
+                  selectNode(currentNode, Boolean(currentNode.latest_gps));
+                }
+              }
+            });
+            nodeItems[nodeId] = item;
+          }
+
           item.className = (gps ? "node has-gps" : "node") + (selectedNodeId === node.node_id ? " selected" : "");
-          item.setAttribute("data-node-id", node.node_id);
           item.innerHTML = [
             '<div class="node-header">',
-            '<div class="node-id">' + escapeHtml(pidLabel) + '</div>',
-            '<div class="badge ' + (gps ? "" : "missing") + '">' + (gps ? "GPS aktif" : "Belum ada GPS") + '</div>',
+            '<div class="node-id">' + escapeHtml(nodeId) + '</div>',
+            '<div class="badge ' + (messages.length ? "message-badge" : (gps ? "" : "missing")) + '">' + (messages.length ? messages.length + " status" : (gps ? "GPS aktif" : "Belum ada GPS")) + '</div>',
             '</div>',
             '<div class="kv">',
-          '<div class="key">Tipe</div><div class="value">' + escapeHtml(deviceType(node)) + '</div>',
-          '<div class="key">Lat/Lon</div><div class="value">' + escapeHtml(latLon) + '</div>',
-          isTelemetryNode(node) ? '<div class="key">Telemetry</div><div class="value">' + escapeHtml(telemetryText(telemetry)) + '</div>' : '<div class="key">Device</div><div class="value">Phone GPS only</div>',
-          '<div class="key">Updated</div><div class="value">' + escapeHtml(formatTimestamp(updatedAt)) + '</div>',
-          '</div>',
-          selectedNodeId === node.node_id ? nodeDetailHtml(node) : ""
-        ].join("");
-
-          item.addEventListener("click", function () {
-            selectNode(node, Boolean(gps));
-          });
-          item.addEventListener("mouseenter", function () {
-            previewNode(node);
-          });
+            '<div class="key">Tipe</div><div class="value">' + escapeHtml(deviceType(node)) + '</div>',
+            '<div class="key">PID</div><div class="value">' + escapeHtml(pidLabel) + '</div>',
+            '<div class="key">Lat/Lon</div><div class="value">' + escapeHtml(latLon) + '</div>',
+            isTelemetryNode(node) ? '<div class="key">Telemetry</div><div class="value">' + escapeHtml(telemetryText(telemetry)) + '</div>' : '<div class="key">Device</div><div class="value">Phone GPS only</div>',
+            '<div class="key">Updated</div><div class="value">' + escapeHtml(formatTimestamp(updatedAt)) + '</div>',
+            '</div>',
+            selectedNodeId === node.node_id ? nodeDetailHtml(node) : ""
+          ].join("");
 
           nodeList.appendChild(item);
+        });
+
+        Object.keys(nodeItems).forEach(function (nodeId) {
+          if (!visibleNodeIds[nodeId]) {
+            nodeItems[nodeId].remove();
+            delete nodeItems[nodeId];
+          }
         });
       }
 
@@ -895,7 +1300,6 @@ MAP_HTML = """
             selectNode(node, false);
           });
           marker.on("mouseover", function () {
-            previewNode(node);
             marker.openPopup();
           });
         });
@@ -918,48 +1322,150 @@ MAP_HTML = """
         map.invalidateSize();
       }
 
-      function refreshNodes() {
-        fetch("broadcast/latest", { cache: "no-store" })
-          .then(function (response) {
-            if (!response.ok) {
-              throw new Error("HTTP " + response.status);
+      function updateReportMarkers(reports) {
+        var visibleReportIds = {};
+        var points = [];
+
+        if (!map) {
+          return;
+        }
+
+        reports.forEach(function (report) {
+          var marker;
+          visibleReportIds[report.id] = true;
+          points.push([report.lat, report.lon]);
+          if (!reportMarkers[report.id]) {
+            reportMarkers[report.id] = L.marker([report.lat, report.lon], {
+              icon: L.divIcon({
+                className: "report-marker-icon",
+                html: '<div class="report-marker"><span>!</span></div>',
+                iconSize: [30, 42],
+                iconAnchor: [15, 38],
+                popupAnchor: [0, -38]
+              }),
+              title: report.title
+            }).addTo(map);
+          }
+          marker = reportMarkers[report.id];
+          marker.setLatLng([report.lat, report.lon]);
+          marker.bindPopup(reportPopupHtml(report));
+        });
+
+        Object.keys(reportMarkers).forEach(function (reportId) {
+          if (!visibleReportIds[reportId]) {
+            map.removeLayer(reportMarkers[reportId]);
+            delete reportMarkers[reportId];
+          }
+        });
+
+        if (!hasFittedReports && points.length > 0) {
+          latestNodes.forEach(function (node) {
+            if (node.latest_gps) {
+              points.push([node.latest_gps.lat, node.latest_gps.lon]);
             }
-            return response.json();
-          })
+          });
+          if (points.length === 1) {
+            map.setView(points[0], 14);
+          } else {
+            map.fitBounds(points, { padding: [36, 36], maxZoom: 15 });
+          }
+          hasFittedReports = true;
+        }
+      }
+
+      function refreshNodes() {
+        nodePollState.timer = null;
+        if (nodePollState.inFlight) {
+          return;
+        }
+        if (document.hidden) {
+          schedulePoll(nodePollState, refreshNodes, NODE_POLL_INTERVAL_MS);
+          return;
+        }
+
+        nodePollState.inFlight = true;
+        fetchJsonWithTimeout("broadcast/latest")
           .then(function (nodes) {
+            nodePollState.failures = 0;
             var withGps = nodes.filter(function (node) {
               return Boolean(node.latest_gps);
             }).length;
-            var selectedNode = null;
             latestNodes = nodes;
-            if (selectedNodeId) {
-              nodes.forEach(function (node) {
-                if (node.node_id === selectedNodeId) {
-                  selectedNode = node;
-                }
-              });
+            if (selectedNodeId && !nodes.some(function (node) {
+              return node.node_id === selectedNodeId;
+            })) {
+              selectedNodeId = null;
             }
             renderNodeList(nodes);
             updateMarkers(nodes);
-            if (selectedNodeId && !selectedNode) {
-              selectedNodeId = null;
-              renderNodeList(nodes);
-            }
             statusEl.textContent = nodes.length + " node terdaftar, " + withGps + " node punya GPS. Update " + new Date().toLocaleTimeString();
             if (window.L) {
               hideMessage();
             }
           })
           .catch(function (error) {
-            statusEl.textContent = "Gagal mengambil data: " + error.message;
+            nodePollState.failures += 1;
+            statusEl.textContent = "Gagal mengambil data; data terakhir tetap ditampilkan: " + pollErrorText(error);
+          })
+          .finally(function () {
+            nodePollState.inFlight = false;
+            schedulePoll(
+              nodePollState,
+              refreshNodes,
+              nextPollDelay(NODE_POLL_INTERVAL_MS, nodePollState.failures)
+            );
+          });
+      }
+
+      function refreshReports() {
+        reportPollState.timer = null;
+        if (reportPollState.inFlight) {
+          return;
+        }
+        if (document.hidden) {
+          schedulePoll(reportPollState, refreshReports, REPORT_POLL_INTERVAL_MS);
+          return;
+        }
+
+        reportPollState.inFlight = true;
+        fetchJsonWithTimeout("reports?limit=100")
+          .then(function (reports) {
+            reportPollState.failures = 0;
+            updateReportMarkers(reports);
+            renderReportList(reports);
+            reportStatusEl.textContent = reports.length + " report. Update " + new Date().toLocaleTimeString();
+          })
+          .catch(function (error) {
+            reportPollState.failures += 1;
+            reportStatusEl.textContent = "Gagal mengambil report; data terakhir tetap ditampilkan: " + pollErrorText(error);
+          })
+          .finally(function () {
+            reportPollState.inFlight = false;
+            schedulePoll(
+              reportPollState,
+              refreshReports,
+              nextPollDelay(REPORT_POLL_INTERVAL_MS, reportPollState.failures)
+            );
           });
       }
 
       initMap();
+      nodesTab.addEventListener("click", function () {
+        activateSidebarTab("nodes");
+      });
+      reportsTab.addEventListener("click", function () {
+        activateSidebarTab("reports");
+      });
       preloadMarkerAsset("phone");
       preloadMarkerAsset("raspi");
       refreshNodes();
-      setInterval(refreshNodes, 2000);
+      refreshReports();
+      document.addEventListener("visibilitychange", function () {
+        if (!document.hidden) {
+          schedulePoll(nodePollState, refreshNodes, 0);
+          schedulePoll(reportPollState, refreshReports, 0);
+        }
+      });
     })();
   </script>
 </body>
